@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b192c" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+  </defs>
+  <!-- Background with rounded corners -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)" />
+  <!-- Border highlight -->
+  <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="url(#goldGrad)" stroke-width="6" opacity="0.4" />
+  
+  <!-- Wave decoration at bottom -->
+  <path d="M 40 400 Q 140 370 240 400 T 440 400 L 440 430 L 40 430 Z" fill="url(#goldGrad)" opacity="0.25" />
+
+  <!-- Newspaper / E monogram icon -->
+  <!-- Letter E stylized like a classic newspaper fold -->
+  <path d="M 140 120 L 372 120 C 385 120 392 130 392 142 L 392 172 C 392 182 385 190 372 190 L 220 190 L 220 236 L 340 236 C 352 236 360 244 360 256 L 360 276 C 360 288 352 296 340 296 L 220 296 L 220 342 L 372 342 C 385 342 392 350 392 362 L 392 392 C 392 402 385 410 372 410 L 140 410 C 126 410 118 402 118 388 L 118 142 C 118 128 126 120 140 120 Z" fill="url(#goldGrad)" />
+
+  <!-- Subtitle Text "EAST TIMES" in SVG -->
+  <text x="256" y="460" font-family="'Pretendard', -apple-system, 'Noto Serif KR', sans-serif" font-size="34" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="6">EAST TIMES</text>
+</svg>

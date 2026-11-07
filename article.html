@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>East Times (이스트 타임스) - 기사 상세</title>
+  
+  <!-- PWA 메타 태그 & 매니페스트 -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b192c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="이스트타임즈" />
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg" />
+
+  <!-- 웹 폰트 & FontAwesome CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- 스타일시트 -->
+  <link rel="stylesheet" href="css/newspaper.css" />
+  <link rel="stylesheet" href="css/article.css" />
+</head>
+<body class="newspaper-body">
+
+  <!-- 1. 최상단 유틸 바 -->
+  <div class="top-util-bar">
+    <div class="util-container">
+      <div class="util-left">
+        <a href="index.html" style="color:inherit; text-decoration:none;"><i class="fas fa-arrow-left"></i> 신문사 메인 포털</a>
+        <span class="util-divider">|</span>
+        <span>제 1,482호 · 2026년 11월 7일 토요일</span>
+      </div>
+      <div class="util-right">
+        <a href="index.html#shop" style="color:var(--c-gold); font-weight:700;"><i class="fas fa-store"></i> 동해 마켓</a>
+        <span class="util-divider">|</span>
+        <a href="admin.html" target="_blank"><i class="fas fa-user-shield"></i> 기자실 CMS</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 신문사 헤더 -->
+  <header class="main-masthead" style="padding:1rem 0 0.8rem 0;">
+    <div class="masthead-inner" style="justify-content:center; text-align:center;">
+      <a href="index.html" class="logo-link">
+        <h1 class="newspaper-brand-title" style="font-size:2.8rem; margin:0;">East Times</h1>
+        <div class="newspaper-brand-sub" style="letter-spacing:4px; font-size:0.75rem;">속초 · 고성 · 양양 영동 북부 대표 정론</div>
+      </a>
+    </div>
+  </header>
+
+  <!-- 3. 메인 네비게이션 바 -->
+  <nav class="main-gnb-bar">
+    <div class="gnb-container">
+      <ul class="gnb-nav-list">
+        <li class="gnb-item"><a href="index.html">홈</a></li>
+        <li class="gnb-item"><a href="index.html?cat=politics">정치·행정</a></li>
+        <li class="gnb-item"><a href="index.html?cat=economy">경제·상권</a></li>
+        <li class="gnb-item"><a href="index.html?cat=society">사회·사건</a></li>
+        <li class="gnb-item"><a href="index.html?cat=culture">문화·관광</a></li>
+        <li class="gnb-item"><a href="index.html?cat=ocean">해양·서핑</a></li>
+        <li class="gnb-item"><a href="index.html?cat=opinion">오피니언</a></li>
+      </ul>
+      <div class="gnb-actions">
+        <a href="index.html#shop" class="btn-nav-action btn-shop-pill">
+          <i class="fas fa-shopping-basket"></i> 특산물 마켓
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 4. 기사 상세 메인 컨테이너 -->
+  <main class="article-page-container" id="articleMainContainer">
+    <!-- 좌측 기사 본문 영역 -->
+    <article class="article-content-wrapper">
+      <div class="article-header">
+        <div>
+          <span class="article-category-badge" id="artCategoryBadge">정치·행정</span>
+          <span class="article-region-badge" id="artRegionBadge">속초·고성</span>
+        </div>
+        
+        <h1 class="article-main-title" id="artTitle">기사 제목을 불러오는 중입니다...</h1>
+        <div class="article-sub-title" id="artSubtitle">기사 서브타이틀 발문</div>
+
+        <div class="article-byline-bar">
+          <div>
+            <span style="font-weight:700; color:#1e293b;" id="artAuthor">기자명</span>
+            <span style="margin:0 0.5rem; color:#cbd5e1;">|</span>
+            <span id="artDate">2026.11.07 14:30</span>
+            <span style="margin:0 0.5rem; color:#cbd5e1;">|</span>
+            <span>조회 <strong id="artViews" style="color:var(--c-deep-navy);">0</strong></span>
+          </div>
+
+          <div class="article-font-resizer">
+            <span style="font-size:0.8rem; margin-right:0.3rem;">글자크기:</span>
+            <button class="btn-font-size" onclick="changeFontSize(-0.1)" title="작게">가-</button>
+            <button class="btn-font-size" onclick="changeFontSize(0)" title="보통">기본</button>
+            <button class="btn-font-size" onclick="changeFontSize(0.1)" title="크게">가+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 대표 보도 사진 -->
+      <div class="article-lead-image-wrap">
+        <img id="artImage" src="" alt="" />
+        <p class="article-image-caption" id="artCaption"></p>
+      </div>
+
+      <!-- 기사 본문 -->
+      <div class="article-body-content" id="artBodyContent">
+        <!-- JS 동적 주입 -->
+      </div>
+
+      <!-- 기사 공유 및 도구 바 -->
+      <div class="article-action-share-bar">
+        <div style="font-size:0.9rem; font-weight:700; color:#334155;">
+          <i class="fas fa-share-alt" style="color:var(--c-gold)"></i> 기사 공유하기
+        </div>
+        <div class="share-buttons-group">
+          <button class="btn-share" onclick="shareArticle('copy')"><i class="fas fa-link"></i> URL 복사</button>
+          <button class="btn-share" onclick="shareArticle('kakao')" style="color:#3c1e1e; background:#fee500; border-color:#fee500;"><i class="fas fa-comment"></i> 카카오</button>
+          <button class="btn-share" onclick="shareArticle('facebook')"><i class="fab fa-facebook-f"></i> 페이스북</button>
+          <button class="btn-share" onclick="shareArticle('twitter')"><i class="fab fa-x-twitter"></i> X(트위터)</button>
+          <button class="btn-share" onclick="shareArticle('print')"><i class="fas fa-print"></i> 인쇄</button>
+        </div>
+      </div>
+
+      <!-- 5대 독자 공감 반응(Reactions) 위젯 -->
+      <section class="reactions-box" id="reactionsContainer">
+        <!-- JS 렌더링 -->
+      </section>
+
+      <!-- 독자 댓글(Comments) 위젯 -->
+      <section class="comments-container" id="commentsContainer">
+        <!-- JS 렌더링 -->
+      </section>
+    </article>
+
+    <!-- 우측 사이드바 -->
+    <aside class="article-sidebar">
+      <!-- 실시간 날씨 및 조석 위젯 -->
+      <div class="sidebar-card-box">
+        <div class="sidebar-card-title">
+          <i class="fas fa-water"></i> 실시간 영동 북부 기상
+        </div>
+        <div id="articleSidebarWeatherBox">
+          <div style="text-align:center; padding:1rem; color:#94a3b8; font-size:0.85rem;">
+            <i class="fas fa-spinner fa-spin"></i> 기상청 실시간 예보 로딩 중...
+          </div>
+        </div>
+      </div>
+
+      <!-- 관련 주요 기사 -->
+      <div class="sidebar-card-box">
+        <div class="sidebar-card-title">
+          <i class="fas fa-fire" style="color:#ef4444;"></i> 실시간 많이 본 뉴스
+        </div>
+        <div id="relatedArticlesList">
+          <!-- JS 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 동해 마켓 추천 특산물 -->
+      <div class="sidebar-card-box" style="background:linear-gradient(135deg, #0b192c, #1e3a8a); color:#fff;">
+        <div style="font-size:0.75rem; color:var(--c-gold); font-weight:800; letter-spacing:2px; margin-bottom:0.4rem;">LOCAL COMMERCE</div>
+        <h4 style="font-size:1.15rem; font-weight:800; margin-bottom:0.6rem;">동해 마켓 직송 특산물</h4>
+        <p style="font-size:0.82rem; color:#cbd5e1; line-height:1.5; margin-bottom:1rem;">속초 붉은대게 장, 양양 송이버섯 키트, 고성 자연산 돌다시마 등</p>
+        <a href="index.html#shop" class="btn-gold-solid" style="display:block; text-align:center; padding:0.6rem; text-decoration:none;">
+          특산물 장터 둘러보기 <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 5. 푸터 -->
+  <footer class="main-footer" style="margin-top:4rem;">
+    <div class="footer-container">
+      <div class="footer-top-row">
+        <div>
+          <div class="footer-brand">East Times</div>
+          <div style="font-size:0.8rem; color:#94a3b8; margin-top:4px;">강원특별자치도 속초·고성·양양 영동 북부 대표 정론</div>
+        </div>
+        <div style="display:flex; gap:1.5rem; font-size:0.85rem;">
+          <a href="index.html">포털 홈</a>
+          <a href="admin.html">기자실 CMS</a>
+          <a href="index.html#shop">동해 마켓</a>
+        </div>
+      </div>
+      <div class="footer-info-text">
+        <p>등록번호: 강원 아-01482호 | 제호: 이스트 타임스 (East Times) | 발행인·편집인: 한승우 | 청소년보호책임자: 김진호</p>
+        <p>주소: 강원특별자치도 속초시 중앙로 150 이스트타임스 미디어센터 | 대표전화: 033-630-1000 | 기사제보: press@easttimes.co.kr</p>
+        <p style="margin-top:0.8rem; color:#64748b;">&copy; 2026 East Times. All rights reserved. 본 사이트의 모든 기사와 콘텐츠는 저작권법의 보호를 받습니다.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 스크립트 로드 -->
+  <script src="data/newsData.js"></script>
+  <script src="js/weatherTideService.js"></script>
+  <script src="js/articleApp.js"></script>
+
+</body>
+</html>

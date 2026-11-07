@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>East Times CMS | 기자 등급별 통합 기사 및 쇼핑몰 관리 센터</title>
 
+  <!-- PWA 메타 태그 & 매니페스트 -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg" />
+
   <!-- 폰트 및 아이콘 CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
@@ -115,67 +120,137 @@
         </table>
       </section>
 
-      <!-- 2) 새 기사 작성 리치 폼 -->
+      <!-- 2) 새 기사 작성 리치 에디터 & 듀얼 라이브 프리뷰 -->
       <section class="admin-card-box" id="write">
         <div class="card-box-header">
-          <h4 style="font-size:1.1rem; font-weight:800; color:#0f172a;"><i class="fas fa-feather"></i> 기사 송고 & 리치 에디터</h4>
+          <h4 style="font-size:1.1rem; font-weight:800; color:#0f172a;"><i class="fas fa-feather"></i> 기사 송고 & 리치 위지윅 에디터</h4>
+          <span style="font-size:0.8rem; color:#0284c7;"><i class="fas fa-eye"></i> 우측 화면에서 실시간 렌더링 미리보기를 지원합니다</span>
         </div>
-        <form id="newArticleForm">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1rem;">
-            <div>
-              <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">취재 카테고리</label>
-              <select id="artWriteCategory" class="role-select" style="width:100%; padding:0.6rem;" required>
-                <option value="politics">정치·행정</option>
-                <option value="economy">경제·상권</option>
-                <option value="society">사회·사건</option>
-                <option value="culture">문화·관광</option>
-                <option value="ocean">해양·서핑</option>
-                <option value="opinion">오피니언·칼럼</option>
-              </select>
+
+        <div class="editor-dual-wrap">
+          <!-- 좌측: 입력 폼 -->
+          <form id="newArticleForm">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+              <div>
+                <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">취재 카테고리</label>
+                <select id="artWriteCategory" class="role-select" style="width:100%; padding:0.6rem;" required>
+                  <option value="politics">정치·행정</option>
+                  <option value="economy">경제·상권</option>
+                  <option value="society">사회·사건</option>
+                  <option value="culture">문화·관광</option>
+                  <option value="ocean">해양·서핑</option>
+                  <option value="opinion">오피니언·칼럼</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">취재 관할 지역</label>
+                <select id="artWriteRegion" class="role-select" style="width:100%; padding:0.6rem;" required>
+                  <option value="속초">속초시</option>
+                  <option value="고성">고성군</option>
+                  <option value="양양">양양군</option>
+                  <option value="영동북부">영동 북부 종합</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">취재 관할 지역</label>
-              <select id="artWriteRegion" class="role-select" style="width:100%; padding:0.6rem;" required>
-                <option value="속초">속초시</option>
-                <option value="고성">고성군</option>
-                <option value="양양">양양군</option>
-                <option value="영동북부">영동 북부 종합</option>
-              </select>
+
+            <div style="margin-bottom:1rem;">
+              <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">기사 메인 제목</label>
+              <input type="text" id="artWriteTitle" class="form-control" placeholder="독자의 시선을 사로잡는 명확하고 사실에 근거한 제목을 입력하세요." required />
+            </div>
+
+            <div style="margin-bottom:1rem;">
+              <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">부제목 (서브헤드 발문)</label>
+              <input type="text" id="artWriteSubtitle" class="form-control" placeholder="핵심 내용 1~2줄 요약 발문" required />
+            </div>
+
+            <!-- 이미지 첨부 (URL 입력 + 로컬 파일 업로드 + 프리셋) -->
+            <div style="margin-bottom:1.2rem;">
+              <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">
+                <i class="fas fa-camera"></i> 보도 사진 첨부 (파일 업로드 또는 웹 이미지 URL)
+              </label>
+              <input type="url" id="artWriteImage" class="form-control" placeholder="https://... 이미지 URL을 직접 입력하거나 아래에서 파일을 선택하세요." />
+              
+              <!-- 파일 업로드 드롭존 -->
+              <div class="image-upload-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
+                <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem; color:#0284c7; margin-bottom:0.3rem;"></i>
+                <div style="font-size:0.85rem; font-weight:700; color:#334155;">클릭하여 컴퓨터 사진 업로드 또는 파일을 여기로 드래그</div>
+                <div style="font-size:0.75rem; color:#94a3b8;">(JPG, PNG, WebP 지원 · Base64 자동 인코딩)</div>
+                <input type="file" id="imageFileInput" accept="image/*" style="display:none;" />
+              </div>
+
+              <!-- 보도사진 프리셋 추천 -->
+              <div class="image-preset-btns">
+                <span style="font-size:0.75rem; color:#64748b; align-self:center;">추천 취재사진:</span>
+                <button type="button" class="preset-chip" onclick="setPresetImage('sokcho')">속초 동해북부선</button>
+                <button type="button" class="preset-chip" onclick="setPresetImage('yangyang')">양양 서핑해변</button>
+                <button type="button" class="preset-chip" onclick="setPresetImage('goseong')">고성 해양심층수</button>
+                <button type="button" class="preset-chip" onclick="setPresetImage('seoraksan')">설악산 단풍</button>
+              </div>
+
+              <div style="margin-top:0.6rem;">
+                <input type="text" id="artWriteCaption" class="form-control" placeholder="보도 사진 설명 캡션을 입력하세요 (예: 속초항 일출 전경)" style="font-size:0.82rem;" />
+              </div>
+            </div>
+
+            <!-- 리치 위지윅 에디터 툴바 & 본문 -->
+            <div style="margin-bottom:1.5rem;">
+              <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">기사 본문 작성 (서식 도구)</label>
+              
+              <!-- 서식 툴바 -->
+              <div class="rich-toolbar">
+                <button type="button" class="rich-btn" onclick="execEditorCmd('bold')" title="굵게"><i class="fas fa-bold"></i></button>
+                <button type="button" class="rich-btn" onclick="execEditorCmd('italic')" title="기울임"><i class="fas fa-italic"></i></button>
+                <button type="button" class="rich-btn" onclick="execEditorCmd('underline')" title="밑줄"><i class="fas fa-underline"></i></button>
+                <button type="button" class="rich-btn" onclick="execEditorCmd('strikeThrough')" title="취소선"><i class="fas fa-strikethrough"></i></button>
+                <span style="border-right:1px solid #cbd5e1; margin:0 0.2rem;"></span>
+                <button type="button" class="rich-btn" onclick="execEditorFormat('h3')" title="소제목 H3"><i class="fas fa-heading"></i> 소제목</button>
+                <button type="button" class="rich-btn" onclick="execEditorFormat('p')" title="일반 본문"><i class="fas fa-paragraph"></i> 본문</button>
+                <button type="button" class="rich-btn" onclick="execEditorFormat('blockquote')" title="인용구"><i class="fas fa-quote-left"></i> 인용구</button>
+                <span style="border-right:1px solid #cbd5e1; margin:0 0.2rem;"></span>
+                <button type="button" class="rich-btn" onclick="execEditorCmd('insertUnorderedList')" title="글머리 기호"><i class="fas fa-list-ul"></i></button>
+                <button type="button" class="rich-btn" onclick="execEditorCmd('insertOrderedList')" title="번호 목록"><i class="fas fa-list-ol"></i></button>
+                <button type="button" class="rich-btn" onclick="execEditorCmd('insertHorizontalRule')" title="구분선"><i class="fas fa-minus"></i></button>
+              </div>
+
+              <!-- 편집 가능한 본문 영역 -->
+              <div id="artRichEditor" class="rich-editor-box" contenteditable="true" placeholder="육하원칙에 맞춘 상세 기사 본문을 작성해 주세요."></div>
+              <!-- 폼 전송용 히든 필드 -->
+              <input type="hidden" id="artWriteContent" name="content" required />
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.8rem;">
+              <button type="button" class="btn-sm" style="background:#f1f5f9; color:#475569; padding:0.6rem 1.4rem; border-radius:6px; font-weight:700;" onclick="saveDraftArticle()">
+                <i class="far fa-save"></i> 임시저장
+              </button>
+              <button type="submit" id="btnRequestPublish" class="btn-sm" style="background:#d97706; color:#fff; padding:0.6rem 1.6rem; border-radius:6px; font-weight:700; display:none;">
+                <i class="fas fa-paper-plane"></i> 데스크 승인 요청 (수습기자)
+              </button>
+              <button type="submit" id="btnDirectPublish" class="btn-sm" style="background:#0284c7; color:#fff; padding:0.6rem 1.6rem; border-radius:6px; font-weight:700;">
+                <i class="fas fa-check"></i> 즉시 정식 발행 (취재기자/데스크)
+              </button>
+            </div>
+          </form>
+
+          <!-- 우측: 실시간 신문 지면 라이브 미리보기 패널 -->
+          <div class="preview-panel-wrap">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+              <span style="font-size:0.82rem; font-weight:800; color:#334155;"><i class="fas fa-desktop"></i> 실시간 독자 지면 미리보기</span>
+              <span style="font-size:0.72rem; color:#94a3b8;">East Times Paper View</span>
+            </div>
+            <div class="preview-paper">
+              <span class="preview-badge" id="previewBadge">정치·행정 · 속초시</span>
+              <h3 class="preview-title" id="previewTitle">기사 제목이 이곳에 실시간으로 표시됩니다</h3>
+              <div class="preview-subtitle" id="previewSubtitle">부제목 요약문이 여기에 표시됩니다.</div>
+              <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.8rem;" id="previewByline">
+                기자명 · 2026.11.07 · 조회수 0
+              </div>
+              <img src="" id="previewImg" class="preview-img" style="display:none;" />
+              <div class="preview-body" id="previewBody">
+                본문 내용을 작성하시면 실제 신문 사이트에 배포될 모습이 실시간으로 렌더링됩니다.
+              </div>
             </div>
           </div>
-
-          <div style="margin-bottom:1rem;">
-            <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">기사 메인 제목</label>
-            <input type="text" id="artWriteTitle" class="form-control" placeholder="독자의 시선을 사로잡는 명확하고 사실에 근거한 제목을 입력하세요." required />
-          </div>
-
-          <div style="margin-bottom:1rem;">
-            <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">부제목 (서브헤드)</label>
-            <input type="text" id="artWriteSubtitle" class="form-control" placeholder="핵심 내용 1~2줄 요약 발문" required />
-          </div>
-
-          <div style="margin-bottom:1rem;">
-            <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">보도 사진 이미지 URL</label>
-            <input type="url" id="artWriteImage" class="form-control" placeholder="https://... (미입력 시 기본 취재 보도사진 자동 첨부)" />
-          </div>
-
-          <div style="margin-bottom:1.5rem;">
-            <label style="font-size:0.85rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">기사 본문 내용</label>
-            <textarea id="artWriteContent" class="form-control" rows="8" placeholder="육하원칙에 맞춘 상세 기사 본문을 작성해 주세요." required></textarea>
-          </div>
-
-          <div style="display:flex; justify-content:flex-end; gap:0.8rem;">
-            <button type="button" class="btn-sm" style="background:#f1f5f9; color:#475569; padding:0.6rem 1.4rem; border-radius:6px; font-weight:700;" onclick="alert('기사 초안이 임시저장되었습니다.')">
-              임시저장
-            </button>
-            <button type="submit" id="btnRequestPublish" class="btn-sm" style="background:#d97706; color:#fff; padding:0.6rem 1.6rem; border-radius:6px; font-weight:700; display:none;">
-              <i class="fas fa-paper-plane"></i> 데스크 승인 요청 (수습기자)
-            </button>
-            <button type="submit" id="btnDirectPublish" class="btn-sm" style="background:#0284c7; color:#fff; padding:0.6rem 1.6rem; border-radius:6px; font-weight:700;">
-              <i class="fas fa-check"></i> 즉시 정식 발행 (취재기자/데스크)
-            </button>
-          </div>
-        </form>
+        </div>
       </section>
 
       <!-- 3) 편집국장 전용: 로컬 특산물 쇼핑몰 주문 및 매출 관리 -->

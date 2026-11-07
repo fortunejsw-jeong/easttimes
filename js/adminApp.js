@@ -1,6 +1,8 @@
 /**
  * East Times (이스트 타임스) 기자 등급별 관리자 CMS 로직 엔진
  * - 등급별 권한 검증 및 기능 활성화/제한
+ * - 리치 위지윅 에디터 & 실시간 신문 지면 라이브 프리뷰
+ * - 이미지 드래그 앤 드롭 파일 업로드 & 보도사진 프리셋
  * - 기사 작성, 임시저장, 승인요청, 직접발행
  * - 데스크 전용: 기사 승인/반려, 메인 헤드라인(TOP LEAD) 지정
  * - 편집국장 전용: 기자 등급 조정, 쇼핑몰 주문 현황 관리
@@ -13,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAdminProfile();
   renderArticlesTable();
   initArticleWriteForm();
+  initRichEditorAndPreview();
   renderShopOrdersTable();
 });
 
@@ -32,6 +35,7 @@ function initRoleSwitcher() {
     renderAdminProfile();
     renderArticlesTable();
     checkPermissionsUI();
+    updateLivePreview();
   });
 }
 
@@ -112,7 +116,10 @@ function renderArticlesTable() {
         </td>
         <td>
           <div style="font-weight:700; color:#0f172a; margin-bottom:0.2rem;">${art.title}</div>
-          <div style="font-size:0.78rem; color:#64748b;">${art.date} · 조회수 ${art.views.toLocaleString()}</div>
+          <div style="font-size:0.78rem; color:#64748b;">
+            ${art.date} · 조회수 ${art.views.toLocaleString()}
+            <a href="article.html?id=${art.id}" target="_blank" style="color:#0284c7; margin-left:8px; text-decoration:none;"><i class="fas fa-external-link-alt"></i> 지면확인</a>
+          </div>
         </td>
         <td style="font-weight:600;">${art.author}</td>
         <td>${isTopLeadBadge}</td>
@@ -172,7 +179,183 @@ window.deleteArticle = function(articleId) {
   }
 };
 
-/* --- 새 기사 작성 폼 초기화 --- */
+/* --- 리치 에디터 명령어 및 서식 포맷 --- */
+window.execEditorCmd = function(command) {
+  document.execCommand(command, false, null);
+  updateLivePreview();
+};
+
+window.execEditorFormat = function(tag) {
+  document.execCommand('formatBlock', false, tag);
+  updateLivePreview();
+};
+
+/* --- 보도사진 추천 프리셋 --- */
+const PHOTO_PRESETS = {
+  sokcho: {
+    url: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1200&q=80",
+    caption: "속초역 일대를 지나는 동해북부선 시험 주행 열차"
+  },
+  yangyang: {
+    url: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1000&q=80",
+    caption: "양양 죽도해변에서 가을 파도를 즐기는 서핑 인파"
+  },
+  goseong: {
+    url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=80",
+    caption: "고성 거진 연안 해양심층수 바이오 밸리 연구시설 전경"
+  },
+  seoraksan: {
+    url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
+    caption: "설악산 공룡능선에 깃든 늦가을 운해와 단풍"
+  }
+};
+
+window.setPresetImage = function(key) {
+  const item = PHOTO_PRESETS[key];
+  if (!item) return;
+
+  document.getElementById('artWriteImage').value = item.url;
+  document.getElementById('artWriteCaption').value = item.caption;
+  updateLivePreview();
+};
+
+/* --- 리치 에디터 및 실시간 라이브 프리뷰 연동 --- */
+function initRichEditorAndPreview() {
+  const titleInput = document.getElementById('artWriteTitle');
+  const subInput = document.getElementById('artWriteSubtitle');
+  const catSelect = document.getElementById('artWriteCategory');
+  const regSelect = document.getElementById('artWriteRegion');
+  const imgInput = document.getElementById('artWriteImage');
+  const captionInput = document.getElementById('artWriteCaption');
+  const richEditor = document.getElementById('artRichEditor');
+
+  // 입력 이벤트 바인딩
+  [titleInput, subInput, catSelect, regSelect, imgInput, captionInput].forEach(el => {
+    if (el) el.addEventListener('input', updateLivePreview);
+    if (el) el.addEventListener('change', updateLivePreview);
+  });
+
+  if (richEditor) {
+    richEditor.addEventListener('input', updateLivePreview);
+  }
+
+  // 이미지 파일 업로드 드롭존
+  const dropZone = document.getElementById('imageDropZone');
+  const fileInput = document.getElementById('imageFileInput');
+
+  if (dropZone && fileInput) {
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        processUploadedImage(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        processUploadedImage(e.target.files[0]);
+      }
+    });
+  }
+
+  updateLivePreview();
+}
+
+function processUploadedImage(file) {
+  if (!file.type.startsWith('image/')) {
+    alert('이미지 파일(JPG, PNG, WebP 등)만 업로드할 수 있습니다.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const base64Url = e.target.result;
+    document.getElementById('artWriteImage').value = base64Url;
+    document.getElementById('artWriteCaption').value = `[현장 사진] ${file.name}`;
+    updateLivePreview();
+    alert(`보도사진 '${file.name}'이 첨부되었습니다.`);
+  };
+  reader.readAsDataURL(file);
+}
+
+// 우측 신문 지면 실시간 프리뷰 업데이트
+function updateLivePreview() {
+  const title = document.getElementById('artWriteTitle')?.value || "기사 제목이 이곳에 실시간으로 표시됩니다";
+  const subtitle = document.getElementById('artWriteSubtitle')?.value || "부제목 요약문이 여기에 표시됩니다.";
+  const cat = document.getElementById('artWriteCategory')?.value || "politics";
+  const reg = document.getElementById('artWriteRegion')?.value || "속초";
+  const imgUrl = document.getElementById('artWriteImage')?.value;
+  const caption = document.getElementById('artWriteCaption')?.value || "";
+  const richHtml = document.getElementById('artRichEditor')?.innerHTML || "";
+
+  const user = getCurrentUser();
+  const catObj = window.EAST_TIMES_DATA?.categories.find(c => c.key === cat) || { label: "종합" };
+
+  const badgeEl = document.getElementById('previewBadge');
+  const titleEl = document.getElementById('previewTitle');
+  const subEl = document.getElementById('previewSubtitle');
+  const bylineEl = document.getElementById('previewByline');
+  const imgEl = document.getElementById('previewImg');
+  const bodyEl = document.getElementById('previewBody');
+
+  if (badgeEl) badgeEl.textContent = `${catObj.label} · ${reg}`;
+  if (titleEl) titleEl.textContent = title;
+  if (subEl) subEl.textContent = subtitle;
+  if (bylineEl) bylineEl.textContent = `${user.name} 기자 · 2026.11.07 · 조회수 1회`;
+
+  if (imgEl) {
+    if (imgUrl) {
+      imgEl.src = imgUrl;
+      imgEl.style.display = 'block';
+    } else {
+      imgEl.style.display = 'none';
+    }
+  }
+
+  if (bodyEl) {
+    if (richHtml && richHtml.trim() !== '<p></p>' && richHtml.trim() !== '<br>') {
+      bodyEl.innerHTML = richHtml;
+    } else {
+      bodyEl.innerHTML = `<span style="color:#94a3b8; font-style:italic;">본문 내용을 작성하시면 실제 신문 사이트에 배포될 모습이 실시간으로 렌더링됩니다.</span>`;
+    }
+  }
+}
+
+// 임시 저장
+window.saveDraftArticle = function() {
+  const title = document.getElementById('artWriteTitle').value;
+  const richHtml = document.getElementById('artRichEditor').innerHTML;
+  
+  if (!title) {
+    alert('기사 제목을 먼저 입력해 주세요.');
+    return;
+  }
+
+  localStorage.setItem('easttimes_article_draft', JSON.stringify({
+    title,
+    subtitle: document.getElementById('artWriteSubtitle').value,
+    category: document.getElementById('artWriteCategory').value,
+    region: document.getElementById('artWriteRegion').value,
+    image: document.getElementById('artWriteImage').value,
+    caption: document.getElementById('artWriteCaption').value,
+    content: richHtml,
+    savedAt: new Date().toLocaleString()
+  }));
+
+  alert('기사 초안이 브라우저 로컬 저장소에 성공적으로 임시저장되었습니다.');
+};
+
+/* --- 새 기사 작성 폼 제출 --- */
 function initArticleWriteForm() {
   const form = document.getElementById('newArticleForm');
   if (!form) return;
@@ -186,8 +369,15 @@ function initArticleWriteForm() {
     const subtitle = document.getElementById('artWriteSubtitle').value;
     const category = document.getElementById('artWriteCategory').value;
     const region = document.getElementById('artWriteRegion').value;
-    const content = document.getElementById('artWriteContent').value;
+    const caption = document.getElementById('artWriteCaption').value || `${region} 일대 취재 현장`;
+    const richContent = document.getElementById('artRichEditor').innerHTML;
     const imgUrl = document.getElementById('artWriteImage').value || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80';
+
+    if (!richContent || richContent.trim() === '<p></p>' || richContent.trim() === '<br>') {
+      alert('기사 본문 내용을 작성해 주세요.');
+      document.getElementById('artRichEditor').focus();
+      return;
+    }
 
     const catObj = window.EAST_TIMES_DATA.categories.find(c => c.key === category) || { label: "종합" };
 
@@ -206,22 +396,24 @@ function initArticleWriteForm() {
       views: 1,
       likes: 0,
       image: imgUrl,
-      imageCaption: `${region} 일대 취재 현장`,
-      summary: content.substring(0, 120) + "...",
-      content: `<p><strong>[${region}=이스트 타임스] ${user.name} 기자</strong> = ${content}</p>`
+      imageCaption: caption,
+      summary: (document.getElementById('artRichEditor').innerText || '').substring(0, 120) + "...",
+      content: `<p><strong>[${region}=이스트 타임스] ${user.name} 기자</strong> =</p>` + richContent
     };
 
     if (role.permissions.canDirectPublish) {
       window.EAST_TIMES_DATA.articles.unshift(newArt);
-      alert(`[직접 발행 완료] '${title}' 기사가 포털 메인에 실시간 발행되었습니다!`);
+      alert(`[직접 발행 완료] '${title}' 기사가 포털 메인 및 지면에 실시간 발행되었습니다!`);
     } else {
       // 수습기자 승인 요청
       alert(`[데스크 승인 요청 접수] 수습기자 원고가 데스크(부장) 검토 대기열에 등록되었습니다.`);
-      window.EAST_TIMES_DATA.articles.push(newArt); // 시뮬레이션을 위해 목록에 보관
+      window.EAST_TIMES_DATA.articles.push(newArt);
     }
 
     form.reset();
+    document.getElementById('artRichEditor').innerHTML = "";
     renderArticlesTable();
+    updateLivePreview();
   });
 }
 

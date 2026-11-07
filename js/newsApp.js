@@ -10,6 +10,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initPwa();
   initBreakingNewsTicker();
   initWeatherTideWidget();
   renderLeadAndBentoNews();
@@ -18,6 +19,33 @@ document.addEventListener('DOMContentLoaded', () => {
   initSearch();
   initReportingAndCitizenForms();
 });
+
+/* --- 0. PWA 설치 및 서비스 워커 등록 --- */
+let deferredPrompt = null;
+function initPwa() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[PWA] Service Worker registered with scope:', reg.scope))
+      .catch(err => console.log('[PWA] Service Worker registration note:', err));
+  }
+
+  const installBtn = document.getElementById('btnPwaInstall');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBtn) {
+      installBtn.style.display = 'inline-flex';
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log('[PWA] User response to install:', outcome);
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+      });
+    }
+  });
+}
 
 /* --- 1. 실시간 속보 롤링 티커 --- */
 function initBreakingNewsTicker() {
@@ -44,40 +72,59 @@ function initBreakingNewsTicker() {
 function initWeatherTideWidget() {
   const weatherBadge = document.getElementById('tideWeatherQuickBadge');
   const detailContainer = document.getElementById('tideDetailWidgetBox');
-  const data = window.EAST_TIMES_DATA.weatherTide;
-  if (!data) return;
 
-  // 상단 퀵 뱃지 (속초 기준 기본)
+  function renderWidgetData() {
+    const data = window.EAST_TIMES_DATA.weatherTide;
+    if (!data) return;
+
+    // 상단 퀵 뱃지 (속초 기준 기본)
+    if (weatherBadge && data.sokcho) {
+      const liveDot = data.sokcho.isLive ? '<span style="color:#22c55e; font-size:0.65rem; margin-right:4px;">● 실시간</span>' : '';
+      weatherBadge.innerHTML = `
+        <i class="fas fa-water" style="color:var(--c-gold)"></i>
+        <span>${liveDot}속초 <strong>${data.sokcho.temp}</strong> (파고 ${data.sokcho.waveHeight} / 수온 ${data.sokcho.waterTemp})</span>
+        <i class="fas fa-chevron-down" style="font-size:0.65rem; opacity:0.7;"></i>
+      `;
+    }
+
+    // 사이드바 바다물때 카드 리스트 렌더링
+    if (detailContainer) {
+      const regions = ['sokcho', 'goseong', 'yangyang'];
+      detailContainer.innerHTML = regions.map(key => {
+        const item = data[key];
+        if (!item) return '';
+        const liveTag = item.isLive ? '<span style="font-size:0.68rem; background:#dcfce7; color:#15803d; padding:0.1rem 0.4rem; border-radius:3px; margin-left:6px; font-weight:700;">실시간 API</span>' : '';
+        return `
+          <div class="tide-card">
+            <div class="tide-region-header">
+              <span><i class="fas ${item.icon}"></i> ${item.name} (${item.condition}) ${liveTag}</span>
+              <span>${item.temp}</span>
+            </div>
+            <div class="tide-grid-data">
+              <div class="tide-data-item">연안 파고:<strong>${item.waveHeight}</strong></div>
+              <div class="tide-data-item">표층 수온:<strong>${item.waterTemp}</strong></div>
+              <div class="tide-data-item" style="grid-column:span 2; color:var(--c-gold);">물때: <strong>${item.tide}</strong></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // 1차 즉시 렌더링
+  renderWidgetData();
+
   if (weatherBadge) {
-    weatherBadge.innerHTML = `
-      <i class="fas fa-water" style="color:var(--c-gold)"></i>
-      <span>속초 <strong>${data.sokcho.temp}</strong> (파고 ${data.sokcho.waveHeight} / 수온 ${data.sokcho.waterTemp})</span>
-      <i class="fas fa-chevron-down" style="font-size:0.65rem; opacity:0.7;"></i>
-    `;
     weatherBadge.addEventListener('click', () => {
       openModal('tideModal');
     });
   }
 
-  // 사이드바 바다물때 카드 리스트 렌더링
-  if (detailContainer) {
-    const regions = ['sokcho', 'goseong', 'yangyang'];
-    detailContainer.innerHTML = regions.map(key => {
-      const item = data[key];
-      return `
-        <div class="tide-card">
-          <div class="tide-region-header">
-            <span><i class="fas ${item.icon}"></i> ${item.name} (${item.condition})</span>
-            <span>${item.temp}</span>
-          </div>
-          <div class="tide-grid-data">
-            <div class="tide-data-item">연안 파고:<strong>${item.waveHeight}</strong></div>
-            <div class="tide-data-item">표층 수온:<strong>${item.waterTemp}</strong></div>
-            <div class="tide-data-item" style="grid-column:span 2; color:var(--c-gold);">물때: <strong>${item.tide}</strong></div>
-          </div>
-        </div>
-      `;
-    }).join('');
+  // 2차: 공공 / Open-Meteo 실시간 API 데이터 수신 후 자동 갱신
+  if (window.EastTimesWeatherService) {
+    window.EastTimesWeatherService.updateAllRegions().then(() => {
+      renderWidgetData();
+    });
   }
 }
 
@@ -219,18 +266,48 @@ window.openArticleModal = function(articleId) {
 
   art.views += 1; // 조회수 증가 반영
 
+  // 반응 데이터 로드
+  const storageReactKey = `easttimes_reactions_${art.id}`;
+  let reactData = JSON.parse(localStorage.getItem(storageReactKey) || 'null');
+  if (!reactData) {
+    reactData = {
+      like: { count: 35, userVoted: false },
+      heart: { count: 12, userVoted: false },
+      cheer: { count: 19, userVoted: false },
+      surprised: { count: 7, userVoted: false },
+      angry: { count: 2, userVoted: false }
+    };
+    localStorage.setItem(storageReactKey, JSON.stringify(reactData));
+  }
+
+  // 댓글 데이터 로드
+  const storageCommentKey = `easttimes_comments_${art.id}`;
+  let comments = JSON.parse(localStorage.getItem(storageCommentKey) || '[]');
+  if (comments.length === 0) {
+    comments = [
+      { id: 'c-1', author: '영동군민', date: '2026.11.07 15:10', content: '현장 소식을 빠르게 전달해 주셔서 고맙습니다.' }
+    ];
+    localStorage.setItem(storageCommentKey, JSON.stringify(comments));
+  }
+
   modalBody.innerHTML = `
     <div style="border-bottom:1px solid #e2e8f0; padding-bottom:1.2rem; margin-bottom:1.5rem;">
-      <div class="meta-row" style="margin-bottom:0.8rem;">
-        <span class="cat-pill" style="font-size:0.85rem;">${art.categoryName}</span>
-        <span style="background:#f1f5f9; padding:0.2rem 0.5rem; border-radius:4px; font-weight:700;">${art.region}</span>
-        <span>${art.date}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+        <div class="meta-row">
+          <span class="cat-pill" style="font-size:0.85rem;">${art.categoryName}</span>
+          <span style="background:#f1f5f9; padding:0.2rem 0.5rem; border-radius:4px; font-weight:700;">${art.region}</span>
+          <span>${art.date}</span>
+        </div>
+        <a href="article.html?id=${art.id}" class="btn-nav-action" style="font-size:0.8rem; background:var(--c-deep-navy); color:var(--c-gold); padding:0.35rem 0.8rem; text-decoration:none;" target="_blank">
+          <i class="fas fa-external-link-alt"></i> 전용 페이지 보기
+        </a>
       </div>
+
       <h2 style="font-family:var(--font-serif); font-size:1.85rem; line-height:1.35; color:var(--c-deep-navy); margin-bottom:0.8rem;">${art.title}</h2>
       <div style="font-size:1.1rem; color:#475569; font-weight:600; line-height:1.5;">${art.subtitle}</div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.2rem; font-size:0.85rem; color:#64748b;">
         <span><strong>${art.author}</strong> (${art.authorRole})</span>
-        <span>조회수 ${art.views.toLocaleString()}회 · 추천 ${art.likes}</span>
+        <span>조회수 ${art.views.toLocaleString()}회</span>
       </div>
     </div>
 
@@ -243,17 +320,93 @@ window.openArticleModal = function(articleId) {
       ${art.content}
     </div>
 
-    <div style="display:flex; justify-content:center; gap:1rem; padding-top:1.5rem; border-top:1px solid #e2e8f0;">
-      <button class="btn-nav-action btn-shop-pill" onclick="alert('기사를 추천하였습니다!')" style="padding:0.6rem 1.5rem;">
-        <i class="far fa-thumbs-up"></i> 기사 추천 (${art.likes})
-      </button>
-      <button class="btn-nav-action" onclick="navigator.clipboard.writeText(window.location.href); alert('기사 링크가 복사되었습니다!');" style="background:#f1f5f9; color:#334155;">
-        <i class="fas fa-share-alt"></i> 기사 공유
-      </button>
+    <!-- 공유 및 바로가기 바 -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem; padding:1rem; background:#f8fafc; border-radius:8px; margin-bottom:1.5rem;">
+      <div style="display:flex; gap:0.5rem;">
+        <button class="btn-nav-action" onclick="navigator.clipboard.writeText(window.location.origin + window.location.pathname.replace('index.html','') + 'article.html?id=${art.id}'); alert('기사 링크가 복사되었습니다!');" style="background:#fff; border:1px solid #cbd5e1; font-size:0.82rem;">
+          <i class="fas fa-link"></i> 기사 링크 복사
+        </button>
+        <a href="article.html?id=${art.id}" class="btn-nav-action" style="background:#0284c7; color:#fff; font-size:0.82rem; text-decoration:none;">
+          <i class="fas fa-file-alt"></i> 기사 상세 전용 뷰로 이동
+        </a>
+      </div>
+    </div>
+
+    <!-- 독자 감정 반응 (Reactions) -->
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:1.2rem; margin-bottom:1.5rem; text-align:center;">
+      <div style="font-size:0.9rem; font-weight:800; color:var(--c-deep-navy); margin-bottom:0.8rem;">이 기사에 공감하셨나요?</div>
+      <div style="display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap;">
+        <button class="btn-reaction ${reactData.like.userVoted ? 'active' : ''}" onclick="toggleModalReaction('${art.id}', 'like')" style="padding:0.5rem 0.8rem;">
+          <span style="font-size:1.2rem;">👍</span> <span style="font-size:0.75rem;">추천</span> <strong style="font-size:0.8rem;">${reactData.like.count}</strong>
+        </button>
+        <button class="btn-reaction ${reactData.heart.userVoted ? 'active' : ''}" onclick="toggleModalReaction('${art.id}', 'heart')" style="padding:0.5rem 0.8rem;">
+          <span style="font-size:1.2rem;">💖</span> <span style="font-size:0.75rem;">감동</span> <strong style="font-size:0.8rem;">${reactData.heart.count}</strong>
+        </button>
+        <button class="btn-reaction ${reactData.cheer.userVoted ? 'active' : ''}" onclick="toggleModalReaction('${art.id}', 'cheer')" style="padding:0.5rem 0.8rem;">
+          <span style="font-size:1.2rem;">👏</span> <span style="font-size:0.75rem;">응원</span> <strong style="font-size:0.8rem;">${reactData.cheer.count}</strong>
+        </button>
+        <button class="btn-reaction ${reactData.surprised.userVoted ? 'active' : ''}" onclick="toggleModalReaction('${art.id}', 'surprised')" style="padding:0.5rem 0.8rem;">
+          <span style="font-size:1.2rem;">😲</span> <span style="font-size:0.75rem;">놀라움</span> <strong style="font-size:0.8rem;">${reactData.surprised.count}</strong>
+        </button>
+        <button class="btn-reaction ${reactData.angry.userVoted ? 'active' : ''}" onclick="toggleModalReaction('${art.id}', 'angry')" style="padding:0.5rem 0.8rem;">
+          <span style="font-size:1.2rem;">😡</span> <span style="font-size:0.75rem;">화나요</span> <strong style="font-size:0.8rem;">${reactData.angry.count}</strong>
+        </button>
+      </div>
+    </div>
+
+    <!-- 간이 댓글 섹션 -->
+    <div style="border-top:1px solid #e2e8f0; padding-top:1.2rem;">
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:0.8rem;"><i class="far fa-comments"></i> 독자 의견 (${comments.length})</h4>
+      <div style="display:flex; gap:0.6rem; margin-bottom:0.8rem;">
+        <input type="text" id="modalCommentAuthor" placeholder="작성자" style="width:120px; padding:0.4rem 0.6rem; border:1px solid #cbd5e1; border-radius:4px; font-size:0.82rem;" />
+        <input type="text" id="modalCommentContent" placeholder="댓글을 입력하세요..." style="flex:1; padding:0.4rem 0.6rem; border:1px solid #cbd5e1; border-radius:4px; font-size:0.82rem;" />
+        <button onclick="submitModalComment('${art.id}')" class="btn-gold-solid" style="padding:0.4rem 1rem; width:auto; font-size:0.82rem;">등록</button>
+      </div>
+      <div id="modalCommentList" style="max-height:180px; overflow-y:auto;">
+        ${comments.map(c => `
+          <div style="background:#f8fafc; padding:0.5rem 0.8rem; border-radius:6px; margin-bottom:0.4rem; font-size:0.82rem;">
+            <div style="display:flex; justify-content:space-between; color:#64748b; font-size:0.75rem; margin-bottom:0.2rem;">
+              <strong>${c.author}</strong> <span>${c.date}</span>
+            </div>
+            <div>${c.content}</div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 
   openModal('articleDetailModal');
+};
+
+window.toggleModalReaction = function(articleId, key) {
+  const storageKey = `easttimes_reactions_${articleId}`;
+  let data = JSON.parse(localStorage.getItem(storageKey) || '{}');
+  if (data[key]) {
+    if (data[key].userVoted) {
+      data[key].count = Math.max(0, data[key].count - 1);
+      data[key].userVoted = false;
+    } else {
+      data[key].count += 1;
+      data[key].userVoted = true;
+    }
+    localStorage.setItem(storageKey, JSON.stringify(data));
+    openArticleModal(articleId);
+  }
+};
+
+window.submitModalComment = function(articleId) {
+  const author = (document.getElementById('modalCommentAuthor').value || '').trim() || '독자';
+  const content = (document.getElementById('modalCommentContent').value || '').trim();
+  if (!content) return alert('댓글 내용을 입력하세요.');
+
+  const storageKey = `easttimes_comments_${articleId}`;
+  let comments = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  
+  comments.unshift({ id: `c-${Date.now()}`, author, date: dateStr, content });
+  localStorage.setItem(storageKey, JSON.stringify(comments));
+  openArticleModal(articleId);
 };
 
 /* --- 6. PDF 지면 신문 뷰어 모달 --- */

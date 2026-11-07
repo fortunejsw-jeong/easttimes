@@ -9,6 +9,15 @@
   <meta name="description" content="설악과 동해의 오늘을 기록하고 내일을 여는 영동 북부 대표 정론 미디어 East Times. 속초·고성·양양 실시간 속보, 바다물때, 종합뉴스, PDF 지면보기 및 로컬 특산물 쇼핑몰." />
   <meta name="keywords" content="이스트타임스, East Times, 속초뉴스, 고성뉴스, 양양뉴스, 동해안물때, 설악산, 영동북부신문, 지역특산물쇼핑몰" />
 
+  <!-- PWA 웹앱 메타 태그 & 매니페스트 -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b192c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="이스트타임즈" />
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg" />
+
   <!-- 폰트 및 아이콘 CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
@@ -34,6 +43,7 @@
         </div>
 
         <div class="util-links">
+          <button id="btnPwaInstall" class="util-link" style="background:none; border:none; cursor:pointer; color:#38bdf8; font-weight:700; display:none;"><i class="fas fa-mobile-alt"></i> 앱 설치</button>
           <a href="#" class="util-link" onclick="openPdfViewer()"><i class="fas fa-file-pdf"></i> 지면보기</a>
           <a href="#" class="util-link" onclick="openModal('reportModal')"><i class="fas fa-bullhorn"></i> 기사제보</a>
           <a href="admin.html" class="util-link" style="color:var(--c-gold); font-weight:700;"><i class="fas fa-user-shield"></i> 기자/CMS 관리</a>
@@ -469,6 +479,7 @@
   <script src="data/newsData.js"></script>
   <script src="data/shopData.js"></script>
   <script src="data/users.js"></script>
+  <script src="js/weatherTideService.js"></script>
   <script src="js/newsApp.js"></script>
   <script src="js/shopApp.js"></script>
 

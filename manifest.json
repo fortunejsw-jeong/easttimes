@@ -1,0 +1,42 @@
+{
+  "name": "East Times - 영동 북부 대표 정론 이스트타임즈",
+  "short_name": "이스트타임즈",
+  "description": "속초·고성·양양 영동 북부 3개 시·군 모던 디지털 지역 신문 & 로컬 커머스 플랫폼",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b192c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./assets/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["news", "magazines", "shopping"],
+  "shortcuts": [
+    {
+      "name": "실시간 속보",
+      "short_name": "속보",
+      "description": "속초·고성·양양 긴급 속보 보기",
+      "url": "./index.html#ticker",
+      "icons": [{ "src": "./assets/icons/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "동해 마켓 (특산물)",
+      "short_name": "동해마켓",
+      "description": "영동 북부 지역 특산물 직거래 마켓",
+      "url": "./index.html#shop",
+      "icons": [{ "src": "./assets/icons/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "기자실 CMS",
+      "short_name": "기자실",
+      "description": "이스트타임즈 기사 송고 및 관리",
+      "url": "./admin.html",
+      "icons": [{ "src": "./assets/icons/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}
