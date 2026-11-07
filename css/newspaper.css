@@ -1,0 +1,1228 @@
+/* ====================================================================
+   East Times (이스트 타임스) 종합 디지털 뉴스 & 로컬 커머스 스타일시트
+   모던 프리미엄 비주얼 & 와이드 헤드라인 & 벤토 그리드 레이아웃
+   ==================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+KR:wght@500;600;700;900&family=Pretendard:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  /* 컬러 시스템 */
+  --font-serif: 'Noto Serif KR', serif;
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  --font-eng-title: 'Cinzel', serif;
+
+  --c-deep-navy: #0b1329;       /* 짙은 동해 바다빛 */
+  --c-navy-dark: #070d1d;
+  --c-navy-card: #141f3d;
+  --c-navy-border: rgba(255, 255, 255, 0.08);
+
+  --c-gold: #d4af37;            /* 영동 일출 골드 */
+  --c-gold-hover: #f1c40f;
+  --c-gold-subtle: rgba(212, 175, 55, 0.12);
+
+  --c-accent-blue: #0284c7;     /* 청명한 동해 하늘 */
+  --c-accent-cyan: #06b6d4;     /* 청량한 파도 */
+  --c-red-breaking: #ef4444;    /* 속보 레드 */
+
+  --c-bg-light: #f8fafc;        /* 지면 오프화이트 */
+  --c-text-primary: #0f172a;    /* 라이트 모드 본문 */
+  --c-text-muted: #64748b;
+  --c-border-light: #e2e8f0;
+
+  --c-dark-text: #f1f5f9;
+  --c-dark-muted: #94a3b8;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 25px rgba(212, 175, 55, 0.2);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 리셋 & 기본 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--c-bg-light);
+  color: var(--c-text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.container-wide {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ====================================================================
+   1. 최상단 실시간 속보 & 바다 물때/날씨 유틸리티 바
+   ==================================================================== */
+.top-ticker-bar {
+  background: var(--c-navy-dark);
+  color: #fff;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--c-navy-border);
+  padding: 0.5rem 0;
+  position: relative;
+  z-index: 100;
+}
+
+.ticker-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.ticker-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  overflow: hidden;
+  flex: 1;
+}
+
+.ticker-badge {
+  background: var(--c-red-breaking);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  animation: pulseBreaking 2s infinite;
+}
+
+@keyframes pulseBreaking {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.ticker-slide-box {
+  height: 24px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.ticker-text {
+  font-weight: 500;
+  color: #e2e8f0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: block;
+  cursor: pointer;
+}
+
+.ticker-text:hover {
+  color: var(--c-gold-hover);
+  text-decoration: underline;
+}
+
+.ticker-right-utils {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* 바다물때 & 날씨 위젯 */
+.tide-weather-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.25rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.tide-weather-badge:hover {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--c-gold);
+  color: #fff;
+}
+
+.util-links {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.util-link {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.util-link:hover {
+  color: var(--c-gold);
+}
+
+/* ====================================================================
+   2. 메인 와이드 마스트헤드 (Masthead & Logo Header)
+   ==================================================================== */
+.main-masthead {
+  background: #ffffff;
+  border-bottom: 1px solid var(--c-border-light);
+  padding: 1.5rem 0 1rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.masthead-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.masthead-info {
+  font-size: 0.82rem;
+  color: var(--c-text-muted);
+  line-height: 1.4;
+}
+
+.masthead-info .edition {
+  font-weight: 700;
+  color: var(--c-deep-navy);
+}
+
+.masthead-brand {
+  text-align: center;
+}
+
+.brand-title {
+  font-family: var(--font-eng-title);
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: var(--c-deep-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.brand-title span.gold-dot {
+  color: var(--c-gold);
+}
+
+.brand-slogan {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: #475569;
+  margin-top: 0.4rem;
+  letter-spacing: 0.5px;
+}
+
+.brand-regions {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.region-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.region-chip.gold {
+  background: var(--c-gold-subtle);
+  border-color: var(--c-gold);
+  color: #854d0e;
+}
+
+.masthead-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-nav-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: var(--transition-smooth);
+}
+
+.btn-report {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.btn-report:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-shop-pill {
+  background: var(--c-deep-navy);
+  color: var(--c-gold);
+  border: 1px solid var(--c-gold);
+  box-shadow: 0 4px 12px rgba(11, 19, 41, 0.2);
+}
+
+.btn-shop-pill:hover {
+  background: var(--c-gold);
+  color: var(--c-deep-navy);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ====================================================================
+   3. 글로벌 네비게이션 바 (GNB)
+   ==================================================================== */
+.gnb-bar {
+  background: #ffffff;
+  border-bottom: 2px solid var(--c-deep-navy);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  backdrop-filter: blur(8px);
+}
+
+.gnb-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gnb-menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 0.2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.gnb-menu::-webkit-scrollbar { display: none; }
+
+.gnb-link {
+  display: block;
+  padding: 0.9rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: #334155;
+  white-space: nowrap;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.gnb-link:hover, .gnb-link.active {
+  color: var(--c-accent-blue);
+}
+
+.gnb-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1.2rem;
+  right: 1.2rem;
+  height: 3px;
+  background: var(--c-accent-blue);
+  border-radius: 2px 2px 0 0;
+}
+
+.gnb-tool-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon-square {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: #475569;
+  font-size: 1.1rem;
+  transition: var(--transition-fast);
+}
+
+.btn-icon-square:hover {
+  background: #f1f5f9;
+  color: var(--c-deep-navy);
+}
+
+/* ====================================================================
+   4. 시원한 와이드 헤드라인 섹션 (Lead Story & Bento Grid)
+   ==================================================================== */
+.lead-hero-section {
+  padding: 2rem 0 3rem 0;
+}
+
+.bento-news-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: auto;
+  gap: 1.5rem;
+}
+
+/* 메인 특종 대형 카드 (Hero Lead Card) */
+.card-hero-lead {
+  grid-column: span 1;
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--c-border-light);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+}
+
+.card-hero-lead:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-img-box {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  background: #000;
+}
+
+.hero-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.card-hero-lead:hover .hero-img-box img {
+  transform: scale(1.04);
+}
+
+.hero-badge-floating {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: var(--c-deep-navy);
+  color: var(--c-gold);
+  border: 1px solid var(--c-gold);
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+}
+
+.hero-content-body {
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--c-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.cat-pill {
+  font-weight: 800;
+  color: var(--c-accent-blue);
+  background: #e0f2fe;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.hero-title-text {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  font-weight: 900;
+  line-height: 1.35;
+  color: var(--c-deep-navy);
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  letter-spacing: -0.5px;
+}
+
+.hero-title-text:hover {
+  color: var(--c-accent-blue);
+}
+
+.hero-subtitle-text {
+  font-size: 1.05rem;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.hero-excerpt-text {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 1.2rem;
+}
+
+.byline-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-border-light);
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* 벤토 서브 그리드 카드 */
+.bento-sub-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card-news-sub {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--c-border-light);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+}
+
+.card-news-sub:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
+}
+
+.sub-img-box {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sub-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card-news-sub:hover .sub-img-box img {
+  transform: scale(1.05);
+}
+
+.sub-content-box {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.sub-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--c-deep-navy);
+  margin: 0.4rem 0 0.6rem 0;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sub-title:hover {
+  color: var(--c-accent-blue);
+}
+
+.sub-excerpt {
+  font-size: 0.88rem;
+  color: var(--c-text-muted);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 우측 사이드바 위젯 영역 */
+.bento-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.widget-box {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-border-light);
+  padding: 1.4rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--c-deep-navy);
+}
+
+.widget-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--c-deep-navy);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.widget-title i {
+  color: var(--c-gold);
+}
+
+/* 바다물때/날씨 상세 카드 */
+.tide-card {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.tide-region-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--c-gold);
+  margin-bottom: 0.5rem;
+}
+
+.tide-grid-data {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.tide-data-item strong {
+  color: #fff;
+  margin-left: 0.3rem;
+}
+
+/* 시민기자 모집 배너 */
+.citizen-reporter-banner {
+  background: linear-gradient(135deg, var(--c-deep-navy), #1e293b);
+  border: 2px solid var(--c-gold);
+  border-radius: var(--radius-md);
+  padding: 1.4rem;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.citizen-reporter-banner::before {
+  content: '✍️';
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  font-size: 5rem;
+  opacity: 0.12;
+}
+
+.citizen-reporter-banner h4 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--c-gold);
+  margin-bottom: 0.4rem;
+}
+
+.citizen-reporter-banner p {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.btn-gold-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--c-gold);
+  color: var(--c-deep-navy);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--radius-full);
+  transition: var(--transition-smooth);
+  width: 100%;
+}
+
+.btn-gold-solid:hover {
+  background: var(--c-gold-hover);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+}
+
+/* ====================================================================
+   5. 카테고리별 뉴스 탐색 & 필터링 섹션
+   ==================================================================== */
+.category-section {
+  padding: 3rem 0;
+  background: #ffffff;
+  border-top: 1px solid var(--c-border-light);
+}
+
+.section-head-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid #0f172a;
+}
+
+.section-title-large {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--c-deep-navy);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.category-tab-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cat-tab-btn {
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid transparent;
+  transition: var(--transition-fast);
+}
+
+.cat-tab-btn:hover {
+  background: #e2e8f0;
+  color: var(--c-deep-navy);
+}
+
+.cat-tab-btn.active {
+  background: var(--c-deep-navy);
+  color: #fff;
+  border-color: var(--c-deep-navy);
+}
+
+.news-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+/* ====================================================================
+   6. East Times Mall (로컬 특산물 상생 쇼핑몰 섹션)
+   ==================================================================== */
+.shop-section-wrap {
+  padding: 4rem 0;
+  background: #0b1329;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.shop-section-wrap::before {
+  content: '';
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.shop-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 1.2rem;
+}
+
+.shop-heading h2 {
+  font-family: var(--font-eng-title);
+  font-size: 2.4rem;
+  color: var(--c-gold);
+  letter-spacing: 1px;
+}
+
+.shop-heading p {
+  color: #94a3b8;
+  font-size: 1rem;
+  margin-top: 0.3rem;
+}
+
+.shop-cart-status-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--c-gold);
+  color: #fff;
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.shop-cart-status-btn:hover {
+  background: var(--c-gold);
+  color: var(--c-deep-navy);
+}
+
+.cart-count-badge {
+  background: var(--c-red-breaking);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+/* 쇼핑몰 상품 카드 그리드 */
+.shop-product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.card-product {
+  background: rgba(20, 31, 61, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+}
+
+.card-product:hover {
+  transform: translateY(-6px);
+  border-color: var(--c-gold);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.prod-img-box {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  position: relative;
+  background: #000;
+}
+
+.prod-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.card-product:hover .prod-img-box img {
+  transform: scale(1.06);
+}
+
+.prod-badge-region {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(11, 19, 41, 0.85);
+  color: var(--c-gold);
+  border: 1px solid var(--c-gold);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+.prod-content-box {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.prod-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  margin-bottom: 0.4rem;
+}
+
+.prod-desc-short {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.prod-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.prod-discount {
+  color: var(--c-red-breaking);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.prod-current-price {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.prod-original-price {
+  font-size: 0.85rem;
+  color: #64748b;
+  text-decoration: line-through;
+}
+
+.prod-btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.btn-prod-action {
+  padding: 0.65rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: var(--transition-fast);
+}
+
+.btn-add-cart {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-add-cart:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-buy-direct {
+  background: var(--c-gold);
+  color: var(--c-deep-navy);
+}
+
+.btn-buy-direct:hover {
+  background: var(--c-gold-hover);
+}
+
+/* ====================================================================
+   7. 푸터 (Footer)
+   ==================================================================== */
+.main-footer {
+  background: #070d1d;
+  color: #94a3b8;
+  padding: 4rem 0 2rem 0;
+  border-top: 1px solid var(--c-navy-border);
+  font-size: 0.88rem;
+}
+
+.footer-top-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.footer-brand h3 {
+  font-family: var(--font-eng-title);
+  font-size: 1.8rem;
+  color: #fff;
+  margin-bottom: 0.6rem;
+}
+
+.footer-brand p {
+  line-height: 1.7;
+  color: #64748b;
+}
+
+.footer-col h5 {
+  color: #fff;
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.footer-links a:hover {
+  color: var(--c-gold);
+}
+
+.footer-bottom-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+/* ====================================================================
+   8. 공통 모달 팝업 레이어 (PDF 뷰어, 장바구니, 제보 폼 등)
+   ==================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(7, 13, 29, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  padding: 1.5rem;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-window {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  transform: translateY(20px) scale(0.98);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-window {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  padding: 1.2rem 1.8rem;
+  border-bottom: 1px solid var(--c-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: var(--c-deep-navy);
+}
+
+.modal-close-btn {
+  font-size: 1.4rem;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.3rem;
+}
+
+.modal-close-btn:hover {
+  color: #0f172a;
+}
+
+.modal-body {
+  padding: 1.8rem;
+}
+
+/* 폼 스타일 */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: #1e293b;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--c-border-light);
+  font-size: 0.95rem;
+  outline: none;
+  font-family: inherit;
+  transition: var(--transition-fast);
+}
+
+.form-control:focus {
+  border-color: var(--c-accent-blue);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+/* ====================================================================
+   9. 반응형 미디어 쿼리 (Mobile Optimization)
+   ==================================================================== */
+@media (max-width: 1024px) {
+  .bento-news-grid {
+    grid-template-columns: 1fr;
+  }
+  .news-card-grid, .shop-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .footer-top-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .masthead-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .masthead-info, .masthead-actions {
+    justify-content: center;
+  }
+  .news-card-grid, .shop-product-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-img-box {
+    height: 240px;
+  }
+  .footer-top-grid {
+    grid-template-columns: 1fr;
+  }
+}

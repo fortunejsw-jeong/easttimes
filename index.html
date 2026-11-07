@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>East Times | 속초·고성·양양 종합 디지털 뉴스 & 로컬 커머스</title>
+
+  <!-- SEO & 메타 정보 -->
+  <meta name="description" content="설악과 동해의 오늘을 기록하고 내일을 여는 영동 북부 대표 정론 미디어 East Times. 속초·고성·양양 실시간 속보, 바다물때, 종합뉴스, PDF 지면보기 및 로컬 특산물 쇼핑몰." />
+  <meta name="keywords" content="이스트타임스, East Times, 속초뉴스, 고성뉴스, 양양뉴스, 동해안물때, 설악산, 영동북부신문, 지역특산물쇼핑몰" />
+
+  <!-- 폰트 및 아이콘 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- 스타일시트 -->
+  <link rel="stylesheet" href="css/newspaper.css" />
+</head>
+<body>
+
+  <!-- ==================== 1. 최상단 실시간 속보 & 바다 물때/날씨 유틸리티 바 ==================== -->
+  <div class="top-ticker-bar">
+    <div class="container-wide ticker-inner">
+      <div class="ticker-left">
+        <span class="ticker-badge"><i class="fas fa-bolt"></i> BREAKING</span>
+        <div class="ticker-slide-box" id="tickerSlideBox">
+          <!-- JS 자동 롤링 -->
+        </div>
+      </div>
+
+      <div class="ticker-right-utils">
+        <!-- 동해안 바다물때/날씨 위젯 뱃지 -->
+        <div class="tide-weather-badge" id="tideWeatherQuickBadge" title="동해안 바다물때 & 날씨 상세보기">
+          <!-- JS 바인딩 -->
+        </div>
+
+        <div class="util-links">
+          <a href="#" class="util-link" onclick="openPdfViewer()"><i class="fas fa-file-pdf"></i> 지면보기</a>
+          <a href="#" class="util-link" onclick="openModal('reportModal')"><i class="fas fa-bullhorn"></i> 기사제보</a>
+          <a href="admin.html" class="util-link" style="color:var(--c-gold); font-weight:700;"><i class="fas fa-user-shield"></i> 기자/CMS 관리</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. 메인 와이드 마스트헤드 ==================== -->
+  <header class="main-masthead">
+    <div class="container-wide masthead-inner">
+      <!-- 좌측 정보 -->
+      <div class="masthead-info">
+        <div><span class="edition">제 1,482호</span> | 2026년 11월 7일 토요일</div>
+        <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">설악과 동해의 정론 미디어</div>
+      </div>
+
+      <!-- 중앙 브랜드 제호 -->
+      <div class="masthead-brand">
+        <a href="index.html" class="brand-title">
+          EAST TIMES<span class="gold-dot">.</span>
+        </a>
+        <div class="brand-slogan">속초 · 고성 · 양양 종합 디지털 뉴스 미디어</div>
+        <div class="brand-regions">
+          <span class="region-chip gold">속초시</span>
+          <span class="region-chip gold">고성군</span>
+          <span class="region-chip gold">양양군</span>
+        </div>
+      </div>
+
+      <!-- 우측 액션 버튼들 -->
+      <div class="masthead-actions">
+        <button class="btn-nav-action btn-report" onclick="openModal('reportModal')">
+          <i class="fas fa-feather-alt"></i> 독자 제보
+        </button>
+        <button class="btn-nav-action btn-shop-pill" onclick="document.getElementById('shopSection').scrollIntoView({behavior:'smooth'})">
+          <i class="fas fa-store"></i> 로컬 마켓
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 3. 글로벌 네비게이션 바 (GNB) ==================== -->
+  <nav class="gnb-bar">
+    <div class="container-wide gnb-inner">
+      <ul class="gnb-menu">
+        <li><a href="#newsSection" class="gnb-link active" onclick="renderCategoryArticles('all')">홈 (종합)</a></li>
+        <li><a href="#newsSection" class="gnb-link" onclick="renderCategoryArticles('politics')">정치·행정</a></li>
+        <li><a href="#newsSection" class="gnb-link" onclick="renderCategoryArticles('economy')">경제·상권</a></li>
+        <li><a href="#newsSection" class="gnb-link" onclick="renderCategoryArticles('society')">사회·사건</a></li>
+        <li><a href="#newsSection" class="gnb-link" onclick="renderCategoryArticles('culture')">문화·관광</a></li>
+        <li><a href="#newsSection" class="gnb-link" onclick="renderCategoryArticles('ocean')">해양·서핑</a></li>
+        <li><a href="#newsSection" class="gnb-link" onclick="renderCategoryArticles('opinion')">오피니언</a></li>
+        <li><a href="#shopSection" class="gnb-link" style="color:var(--c-gold); font-weight:800;"><i class="fas fa-gift"></i> 특산물 쇼핑몰</a></li>
+      </ul>
+
+      <div class="gnb-tool-btns">
+        <button class="btn-icon-square" onclick="openModal('searchModal')" title="통합 기사 검색">
+          <i class="fas fa-search"></i>
+        </button>
+        <button class="btn-icon-square" onclick="openPdfViewer()" title="PDF 지면 신문 뷰어">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <button class="btn-icon-square" onclick="openCartModal()" title="쇼핑몰 장바구니">
+          <i class="fas fa-shopping-cart"></i>
+          <span id="headerCartCount" style="background:#ef4444; color:#fff; font-size:0.65rem; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; margin-left:-8px; margin-top:-14px;">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== 4. 와이드 헤드라인 섹션 (Lead Story & Bento Grid) ==================== -->
+  <section class="lead-hero-section">
+    <div class="container-wide">
+      <div class="bento-news-grid">
+        <!-- 1) 메인 특종 대형 카드 (2 Column span) -->
+        <article class="card-hero-lead" id="heroLeadCard">
+          <!-- JS 렌더링 -->
+        </article>
+
+        <!-- 2) 벤토 서브 중간 기사 컬럼 (1 Column) -->
+        <div class="bento-sub-column" id="bentoSubColumn">
+          <!-- JS 렌더링 -->
+        </div>
+
+        <!-- 3) 우측 사이드바 위젯 (바다물때/날씨 & 시민기자 모집) (1 Column) -->
+        <div class="bento-side-column">
+          <!-- 바다 물때 & 날씨 상세 카드 -->
+          <div class="widget-box">
+            <div class="widget-header">
+              <span class="widget-title"><i class="fas fa-water"></i> 동해안 바다물때 & 날씨</span>
+              <span style="font-size:0.75rem; color:#64748b;">실시간 관측</span>
+            </div>
+            <div id="tideDetailWidgetBox">
+              <!-- JS 렌더링 -->
+            </div>
+          </div>
+
+          <!-- 시민기자 모집 안내 배너 -->
+          <div class="citizen-reporter-banner">
+            <span style="font-size:0.75rem; background:rgba(212,175,55,0.2); color:var(--c-gold); padding:0.2rem 0.6rem; border-radius:4px; font-weight:800; display:inline-block; margin-bottom:0.5rem;">
+              RECRUIT · 제 4기
+            </span>
+            <h4>이스트 타임스 시민기자단 모집</h4>
+            <p>속초 · 고성 · 양양의 숨은 소식과 이웃의 감동을 직접 발굴해 전할 열정적인 시민기자를 찾습니다.</p>
+            <button class="btn-gold-solid" onclick="openModal('citizenModal')">
+              <i class="fas fa-paper-plane"></i> 시민기자 지원하기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 5. 카테고리별 종합 뉴스 탐색 섹션 ==================== -->
+  <section class="category-section" id="newsSection">
+    <div class="container-wide">
+      <div class="section-head-bar">
+        <h2 class="section-title-large">
+          <i class="fas fa-newspaper" style="color:var(--c-accent-blue);"></i> 종합 뉴스 데스크
+        </h2>
+        <div class="category-tab-buttons" id="categoryTabButtons">
+          <!-- JS 동적 탭 -->
+        </div>
+      </div>
+
+      <div class="news-card-grid" id="categoryNewsGrid">
+        <!-- JS 렌더링 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 6. East Times Mall (로컬 상생 쇼핑몰 섹션) ==================== -->
+  <section class="shop-section-wrap" id="shopSection">
+    <div class="container-wide">
+      <div class="shop-header-flex">
+        <div class="shop-heading">
+          <span style="color:var(--c-gold); font-size:0.85rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;">East Times Local Commerce</span>
+          <h2>East Times Mall.</h2>
+          <p>설악과 동해가 빚은 속초 · 고성 · 양양 3개 시군 엄선 로컬 셀렉트숍</p>
+        </div>
+        <button class="shop-cart-status-btn" onclick="openCartModal()">
+          <i class="fas fa-shopping-bag"></i> 장바구니 보기
+          <span class="cart-count-badge" id="shopSectionCartBadge">0</span>
+        </button>
+      </div>
+
+      <!-- 쇼핑몰 상품 카드 그리드 -->
+      <div class="shop-product-grid" id="shopProductGrid">
+        <!-- JS 렌더링 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 7. 푸터 ==================== -->
+  <footer class="main-footer">
+    <div class="container-wide">
+      <div class="footer-top-grid">
+        <div class="footer-brand">
+          <h3>EAST TIMES</h3>
+          <p>설악과 동해의 오늘을 기록하고 내일을 여는 영동 북부 대표 정론 미디어.<br />
+          속초시 · 고성군 · 양양군 전역의 생생한 뉴스와 로컬 커머스 상생 생태계를 구축합니다.</p>
+          <div style="margin-top:1.2rem; font-size:0.8rem; color:#475569;">
+            등록번호: 강원 아 00142 | 발행인 겸 편집인: 한승우 | 청소년보호책임자: 김진호
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>종합 뉴스</h5>
+          <ul class="footer-links">
+            <li><a href="#newsSection" onclick="renderCategoryArticles('politics')">정치·행정</a></li>
+            <li><a href="#newsSection" onclick="renderCategoryArticles('economy')">경제·상권</a></li>
+            <li><a href="#newsSection" onclick="renderCategoryArticles('society')">사회·사건</a></li>
+            <li><a href="#newsSection" onclick="renderCategoryArticles('culture')">문화·관광</a></li>
+            <li><a href="#newsSection" onclick="renderCategoryArticles('ocean')">해양·서핑</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>독자 참여 & 미디어</h5>
+          <ul class="footer-links">
+            <li><a href="#" onclick="openPdfViewer()">지면 신문 PDF 보기</a></li>
+            <li><a href="#" onclick="openModal('reportModal')">독자 기사 제보</a></li>
+            <li><a href="#" onclick="openModal('citizenModal')">시민기자 지원센터</a></li>
+            <li><a href="#shopSection">East Times 로컬몰</a></li>
+            <li><a href="admin.html" style="color:var(--c-gold);">기자/데스크 CMS</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>미디어센터 안내</h5>
+          <p style="margin-bottom:0.4rem;"><i class="fas fa-map-marker-alt"></i> 강원특별자치도 속초시 중앙로 150 이스트타임스 빌딩</p>
+          <p style="margin-bottom:0.4rem;"><i class="fas fa-phone-alt"></i> 독자상담 & 제보: 033-630-1000</p>
+          <p style="margin-bottom:0.4rem;"><i class="fas fa-envelope"></i> 보도자료: press@easttimes.co.kr</p>
+          <p style="font-size:0.75rem; color:#475569; margin-top:0.8rem;">평일 09:00 ~ 18:00 (주말/공휴일 당직 데스크 운영)</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <span>© 2026 East Times Media Corp. All rights reserved.</span>
+        <span>본 사이트의 모든 기사 및 콘텐츠는 저작권법의 보호를 받습니다. 무단 전재 및 복제를 금합니다.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== 8. 모달 팝업 레이어 모음 ==================== -->
+
+  <!-- 1) 기사 상세 보기 모달 -->
+  <div class="modal-overlay" id="articleDetailModal">
+    <div class="modal-window" style="max-width:850px;">
+      <div class="modal-header">
+        <span style="font-family:var(--font-eng-title); font-size:1.1rem; color:var(--c-gold); font-weight:800;">EAST TIMES ARTICLE</span>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="articleModalBody">
+        <!-- JS 렌더링 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 2) PDF 지면 신문 뷰어 모달 -->
+  <div class="modal-overlay" id="pdfViewerModal">
+    <div class="modal-window" style="max-width:800px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-pdf" style="color:#ef4444;"></i> East Times 지면 신문 PDF 뷰어</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.9rem; color:#64748b; margin-bottom:1.5rem;">
+          종이 신문 그대로의 판형과 헤드라인 배치를 언제 어디서든 디지털 고화질 지면으로 확인하실 수 있습니다.
+        </p>
+        <div id="pdfEditionsList">
+          <!-- JS 렌더링 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3) 독자 기사 제보 모달 -->
+  <div class="modal-overlay" id="reportModal">
+    <div class="modal-window" style="max-width:650px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-bullhorn" style="color:var(--c-accent-blue);"></i> 독자 기사 제보 센터</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.9rem; color:#64748b; margin-bottom:1.5rem;">
+          속초·고성·양양의 생생한 사건, 미담, 부조리, 축제 소식을 전해주세요. 제보자의 신원은 철저히 비밀이 보장됩니다.
+        </p>
+        <form id="readerReportForm">
+          <div class="form-group">
+            <label>제보 지역</label>
+            <select class="form-control" required>
+              <option value="속초시">강원특별자치도 속초시</option>
+              <option value="고성군">강원특별자치도 고성군</option>
+              <option value="양양군">강원특별자치도 양양군</option>
+              <option value="영동권종합">기타 영동 북부 권역</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>제보 제목</label>
+            <input type="text" class="form-control" placeholder="제보의 핵심 요약을 적어주세요" required />
+          </div>
+          <div class="form-group">
+            <label>상세 내용</label>
+            <textarea class="form-control" rows="5" placeholder="언제, 어디서, 어떤 일이 일어났는지 육하원칙에 따라 상세히 기술해 주세요." required></textarea>
+          </div>
+          <div class="form-group">
+            <label>제보자 연락처 (선택 / 취재 확인용)</label>
+            <input type="tel" class="form-control" placeholder="010-0000-0000 (철저한 익명 보장)" />
+          </div>
+          <button type="submit" class="btn-gold-solid" style="padding:0.8rem; font-size:1rem; width:100%;">
+            <i class="fas fa-paper-plane"></i> 제보 접수하기
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4) 시민기자 지원 모달 -->
+  <div class="modal-overlay" id="citizenModal">
+    <div class="modal-window" style="max-width:650px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-id-badge" style="color:var(--c-gold);"></i> 이스트 타임스 시민기자 지원</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.9rem; color:#64748b; margin-bottom:1.5rem;">
+          시민기자로 선발되시면 공식 기자증 발급, 소정의 원고료 지급 및 취재 지원 혜택이 주어집니다.
+        </p>
+        <form id="citizenReporterForm">
+          <div class="form-group">
+            <label>지원자 성명</label>
+            <input type="text" class="form-control" placeholder="성함 입력" required />
+          </div>
+          <div class="form-group">
+            <label>거주 지역</label>
+            <select class="form-control" required>
+              <option value="속초">속초시 거주</option>
+              <option value="고성">고성군 거주</option>
+              <option value="양양">양양군 거주</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>희망 취재 분야</label>
+            <input type="text" class="form-control" placeholder="예: 로컬 상권 탐방, 해양 서핑/레저, 문화예술 등" required />
+          </div>
+          <div class="form-group">
+            <label>지원 동기 및 간략한 자기소개</label>
+            <textarea class="form-control" rows="4" placeholder="시민기자로 활동하고 싶은 이유와 관심사를 적어주세요." required></textarea>
+          </div>
+          <button type="submit" class="btn-gold-solid" style="padding:0.8rem; font-size:1rem; width:100%;">
+            <i class="fas fa-check-circle"></i> 시민기자 지원서 제출
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5) 실시간 기사 통합 검색 모달 -->
+  <div class="modal-overlay" id="searchModal">
+    <div class="modal-window" style="max-width:700px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-search" style="color:var(--c-accent-blue);"></i> East Times 통합 검색</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="position:relative; margin-bottom:1.5rem;">
+          <input type="text" id="globalSearchInput" class="form-control" placeholder="기사 제목, 핵심 키워드, 기자명, 지역(속초/고성/양양) 검색..." style="padding-left:2.5rem; font-size:1.05rem;" />
+          <i class="fas fa-search" style="position:absolute; left:1rem; top:1rem; color:#94a3b8;"></i>
+        </div>
+        <div id="searchResultsBox" style="max-height:350px; overflow-y:auto;">
+          <p style="color:#94a3b8; text-align:center; padding:2rem;">검색어를 입력해 주세요.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6) 장바구니 모달 -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-window" style="max-width:720px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-shopping-bag" style="color:var(--c-gold);"></i> 로컬 마켓 장바구니</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="cartItemsList">
+          <!-- JS 렌더링 -->
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #0f172a; padding-top:1.2rem; margin-top:1.5rem;">
+          <span style="font-size:1.05rem; font-weight:700;">총 결제 예정 금액</span>
+          <span id="cartTotalPrice" style="font-size:1.5rem; font-weight:900; color:#ef4444;">0원</span>
+        </div>
+        <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+          <button class="btn-nav-action" onclick="closeModal('cartModal')" style="flex:1; justify-content:center; background:#f1f5f9; color:#475569;">
+            계속 쇼핑하기
+          </button>
+          <button class="btn-gold-solid" onclick="proceedToCheckout()" style="flex:1.5; justify-content:center; font-size:1rem; padding:0.8rem;">
+            <i class="fas fa-credit-card"></i> 주문서 작성 및 결제
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7) 주문서 작성 및 결제 모달 -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-window" style="max-width:680px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-receipt" style="color:var(--c-accent-blue);"></i> 로컬 특산물 안심 주문서</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:1.2rem; margin-bottom:1.5rem;">
+          <h5 style="margin-bottom:0.6rem; color:#0f172a;">주문 상품 내역</h5>
+          <div id="checkoutSummaryItems"></div>
+          <div style="display:flex; justify-content:space-between; border-top:1px solid #cbd5e1; padding-top:0.6rem; margin-top:0.6rem; font-weight:800;">
+            <span>최종 결제 금액</span>
+            <span id="checkoutSummaryTotal" style="color:#ef4444;">0원</span>
+          </div>
+        </div>
+
+        <form id="checkoutOrderForm">
+          <div class="form-group">
+            <label>주문자 및 수령인 성함</label>
+            <input type="text" id="buyerName" class="form-control" placeholder="홍길동" required />
+          </div>
+          <div class="form-group">
+            <label>연락처</label>
+            <input type="tel" id="buyerPhone" class="form-control" placeholder="010-1234-5678" required />
+          </div>
+          <div class="form-group">
+            <label>배송지 주소</label>
+            <input type="text" id="buyerAddress" class="form-control" placeholder="도로명 주소 및 상세 주소 입력" required />
+          </div>
+          <div class="form-group">
+            <label>결제 수단 선택</label>
+            <div style="display:flex; gap:1.2rem; margin-top:0.4rem;">
+              <label style="display:flex; align-items:center; gap:0.4rem; font-weight:500;">
+                <input type="radio" name="payMethod" value="신용/체크카드" checked /> 신용/체크카드 (안심결제)
+              </label>
+              <label style="display:flex; align-items:center; gap:0.4rem; font-weight:500;">
+                <input type="radio" name="payMethod" value="카카오페이 / 네이버페이" /> 간편결제 (카카오/네이버페이)
+              </label>
+              <label style="display:flex; align-items:center; gap:0.4rem; font-weight:500;">
+                <input type="radio" name="payMethod" value="무통장입금" /> 가상계좌 입금
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="btn-gold-solid" style="padding:0.9rem; font-size:1.05rem; width:100%; margin-top:1rem;">
+            <i class="fas fa-lock"></i> 안전 결제 승인 완료
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8) 결제 완료 영수증 모달 -->
+  <div class="modal-overlay" id="orderCompleteModal">
+    <div class="modal-window" style="max-width:600px;">
+      <div class="modal-body" id="orderSuccessReceipt">
+        <!-- JS 렌더링 -->
+      </div>
+      <div style="padding:0 1.8rem 1.8rem 1.8rem; text-align:center;">
+        <button class="btn-gold-solid" onclick="closeModal('orderCompleteModal')" style="padding:0.8rem 2rem; width:auto;">
+          확인 완료 (쇼핑 계속하기)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 데이터 및 비즈니스 로직 스크립트 바인딩 -->
+  <script src="data/newsData.js"></script>
+  <script src="data/shopData.js"></script>
+  <script src="data/users.js"></script>
+  <script src="js/newsApp.js"></script>
+  <script src="js/shopApp.js"></script>
+
+</body>
+</html>
